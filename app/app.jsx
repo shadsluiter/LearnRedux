@@ -11,10 +11,11 @@ $(document).foundation();
 require('style!css!sass!applicationStyles')
 
 
-ReactDOM.render(
+// ReactDOM.render(
+//
+// <p>Boilerplate 3 project</p>,
+//     document.getElementById('app')
+//     );
 
-<p>Boilerplate 3 project</p>,
-    document.getElementById('app')
-    );
-
-require ('./redux-example.jsx');
+//require ('./redux-example2.jsx');
+require ('./redux-todo-example2.jsx');
