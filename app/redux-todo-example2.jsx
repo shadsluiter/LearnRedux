@@ -3,7 +3,7 @@ var redux = require('redux');
 console.log('starting redux example');
 
 var stateDefault = {
-  searchText: '',
+  searchText: 'No search term',
   showCompleted: false,
   todos:[]
 };
@@ -23,10 +23,16 @@ var reducer = (state = stateDefault, action) => {
 
 };
 
-var store = redux.createStore(reducer);
+var store = redux.createStore(reducer, redux.compose(
+  window.devToolsExtension ? window.devToolsExtension() : f => f
+));
 
-var currentState = store.getState();
-console.log('currentState', currentState);
+var unsubscribe = store.subscribe(function(){
+    var state = store.getState();
+    console.log('currentState -> ', state);
+    document.getElementById('app').innerHTML = state.searchText;
+
+});
 
 
 var action = {
@@ -35,5 +41,14 @@ var action = {
 };
 store.dispatch(action);
 
-var currentState = store.getState();
-console.log('Search text should say monkey pictures -> ', currentState);
+var action = {
+  type: 'CHANGE_SEARCH_TEXT',
+  searchText: 'Job for Shad'
+};
+store.dispatch(action);
+
+var action = {
+  type: 'CHANGE_SEARCH_TEXT',
+  searchText: 'Looking for peace'
+};
+store.dispatch(action);
