@@ -1,13 +1,10 @@
 var redux = require('redux');
 
 console.log('starting redux example');
-var stateDefault = {
-  name: 'Anonymous',
-  hobbies: [],
-  movies: []
-};
-var nextHobbyId = 1;
-var nextMovieId = 1;
+
+
+
+// ---- name reducer and action generators
 
 var nameReducer = function(state = 'Anonymous', action) {
   // state now refers to the name of the person.
@@ -20,6 +17,17 @@ var nameReducer = function(state = 'Anonymous', action) {
   };
 };
 
+var changeName = (name) => {
+  return {
+    type:'CHANGE_NAME',
+    // name: name
+    name
+  }
+};
+
+
+// ----- hobby reducer and action generators
+var nextHobbyId = 1;
 var hobbiesReducer = function(state =[],action) {
 
   // notice that state now refers to the array of hobbies.
@@ -43,6 +51,22 @@ var hobbiesReducer = function(state =[],action) {
   };
 };
 
+var addHobby = (hobby) => {
+  return {
+    type:'ADD_HOBBY',
+    hobby
+  }
+};
+
+var removeHobby = (id) => {
+  return {
+    type:'REMOVE_HOBBY',
+    id
+  }
+};
+
+// ----- movie reducer and action generators
+var nextMovieId = 1;
 var movieReducer = function(movies_state = [], action) {
   switch(action.type){
 
@@ -65,8 +89,26 @@ var movieReducer = function(movies_state = [], action) {
     default:
       return movies_state;
 };
-
 };
+
+var addMovie = function(movie,genre) {
+  return {
+    type:'ADD_MOVIE',
+    movie,
+    genre
+  }
+};
+
+var removeMovie = function(id) {
+  return {
+    type:'REMOVE_MOVIE',
+    id
+  }
+};
+
+
+
+// --- combined reducer
 var reducer = redux.combineReducers({
   name: nameReducer,
   hobbies: hobbiesReducer,
@@ -84,59 +126,13 @@ var unsubscribe = store.subscribe(function(){
     document.getElementById('app').innerHTML = state.name;
 });
 
-var action = {
-  type:'CHANGE_NAME',
-  name:'Shad'
-};
-
-store.dispatch(action);
-
-store.dispatch ({
-  type: 'ADD_HOBBY',
-  hobby: 'Running'
-});
-
-store.dispatch ({
-  type: 'ADD_HOBBY',
-  hobby: 'Watching TV'
-});
-store.dispatch ({
-  type: 'ADD_HOBBY',
-  hobby: 'Programming'
-});
-
-store.dispatch ({
-  type: 'REMOVE_HOBBY',
-  id: 2
-});
-action = {
-  type:'CHANGE_NAME',
-  name:'Tim'
-};
-
-store.dispatch(action);
-
-action = {
-  type:'ADD_MOVIE',
-  movie:'Harry Potter',
-  genre:'Fantasy'
-};
-
-store.dispatch(action);
-
-store.dispatch({
-  type: 'ADD_MOVIE',
-  movie: 'Star Wars',
-  genre: 'Science Fiction'
-  });
-
-  store.dispatch({
-    type: 'ADD_MOVIE',
-    movie: 'Home Alone',
-    genre: 'Comedy'
-    });
-
-    store.dispatch({
-      type: 'REMOVE_MOVIE',
-      id: 2
-      });
+store.dispatch (changeName('Shad'));
+store.dispatch (addHobby('Running'));
+store.dispatch (addHobby('Watch TV'));
+store.dispatch (addHobby('Fly drones'));
+store.dispatch (removeHobby(2));
+store.dispatch (changeName('Tim'));
+store.dispatch (addMovie('Harry Potter', 'Fantasy'));
+store.dispatch (addMovie('Star Wars', 'Sci Fi'));
+store.dispatch (addMovie('Home Alone', 'Comedy'));
+store.dispatch (removeMovie(2));
