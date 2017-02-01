@@ -1,5 +1,5 @@
 var redux = require('redux');
-
+var axios = require('axios');
 console.log('starting redux example');
 
 
@@ -107,12 +107,64 @@ var removeMovie = function(id) {
 };
 
 
+// ---- map reducer and action generators
+// --------------------------------------
+
+
+// intitate the location search.  Called first from fetchLocation
+var startLocationFetch = () => {
+  return {
+    type: 'START_LOCATION_FETCH'
+  };
+};
+
+// only called on a successful data return from api. called inside fetchLocation
+var completeLocationFetch = (url) => {
+  return {
+    type: 'COMPLETE_LOCATION_FETCH',
+    url
+  };
+};
+
+var mapReducer = (state ={isFetching: false, url:undefined}, action) => {
+  switch (action.type) {
+    case 'START_LOCATION_FETCH':
+      return {
+        isFetching:true,
+        url: action.url
+      };
+      case 'COMPLETE_LOCATION_FETCH':
+      return {
+        isFetching:false,
+        url:action.url
+      };
+      default:
+        return state;
+  }
+};
+
+
+// combines two step process (1) startLocationFetch and (2) completeLocationFetch
+var fetchLocation = () => {
+  store.dispatch(startLocationFetch());
+
+  axios.get('http://ipinfo.io').then(function (res) {
+    var loc = res.data.loc;
+    var baseURL = 'http://maps.google.com?q='
+
+    store.dispatch(completeLocationFetch(baseURL + loc));
+
+  });
+};
+
 
 // --- combined reducer
+// ----------------------
 var reducer = redux.combineReducers({
   name: nameReducer,
   hobbies: hobbiesReducer,
-  movies: movieReducer
+  movies: movieReducer,
+  map: mapReducer
 });
 var store = redux.createStore(reducer, redux.compose(
   window.devToolsExtension ? window.devToolsExtension() : f => f
@@ -122,9 +174,18 @@ var store = redux.createStore(reducer, redux.compose(
 var unsubscribe = store.subscribe(function(){
     var state = store.getState();
     console.log('currentState -> ', state);
-    console.log('The new name is ', state.name);
-    document.getElementById('app').innerHTML = state.name;
+
+    if (state.map.isFetching) {
+      document.getElementById('app').innerHTML ='Loading';
+    }
+    else if (state.map.url) {
+      console.log(state.map.url);
+        document.getElementById('app').innerHTML =  '<a href = ' + state.map.url + '>View your location</a>';
+    }
 });
+
+
+fetchLocation();
 
 store.dispatch (changeName('Shad'));
 store.dispatch (addHobby('Running'));
